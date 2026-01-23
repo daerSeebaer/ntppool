@@ -77,13 +77,16 @@ sub active_servers {
     my $dbh = NP::Model->dbh;
 
     my $entries = $dbh->selectall_arrayref(
-        qq[SELECT s.ip, s.netspeed
+        qq[SELECT s.ip, s.netspeed * (s.score_raw - ?) / (? - ?)
          FROM servers s, server_zones l
          WHERE l.server_id = s.id AND l.zone_id = ? AND s.in_pool = 1 AND s.ip_version=?
          AND s.score_raw >= ?
          AND s.netspeed > 0
          and (s.deletion_on IS NULL OR s.deletion_on > DATE_ADD(NOW(), interval ? day))
         ], undef,
+        NP::Model::Server->active_score,
+        NP::Model::Server->max_score,
+        NP::Model::Server->active_score,
         $self->id,
         $ip_version,
         NP::Model::Server->active_score,

@@ -17,6 +17,10 @@ POSIX::tzset();
 
 my $config = Combust::Config->new;
 
+sub max_score {
+    return 20;
+}
+
 sub active_score {
     return 10;
 }
